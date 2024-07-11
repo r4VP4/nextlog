@@ -13,7 +13,11 @@ class Logger(logging.Logger):
 
         self.loki_url = kwargs.get('loki_url',None)
         self.labels = kwargs.get('labels',{})
-        self.redis_server = redis.Redis(host='localhost',port=6379,db=0)
+        if 'redis_creds' in kwargs:
+            self.redis_server = redis.Redis(**kwargs['redis_creds'])
+            kwargs.pop('redis_creds')
+        else:
+            self.redis_server = redis.Redis(host='localhost',port=6379,db=0)
         self.running = True
         self.send_logs_thread = threading.Thread(target=self.send_logs)
         self.send_logs_thread.start()
